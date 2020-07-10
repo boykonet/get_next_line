@@ -12,9 +12,9 @@
 
 #include "get_next_line.h"
 
-size_t				ft_strlen(const char *s)
+size_t					ft_strlen(const char *s)
 {
-	int				i;
+	int					i;
 
 	i = 0;
 	if (s == NULL || *s == '\0')
@@ -24,12 +24,12 @@ size_t				ft_strlen(const char *s)
 	return (i);
 }
 
-char				*ft_strjoin(char const *s1, char const *s2)
+char					*ft_strjoin(char const *s1, char const *s2)
 {
-	char			*dst;
-	size_t			strlen1;
-	size_t			strlen2;
-	size_t			count;
+	char				*dst;
+	size_t				strlen1;
+	size_t				strlen2;
+	size_t				count;
 
 	count = 0;
 	if (s1 == NULL || s2 == NULL)
@@ -47,10 +47,10 @@ char				*ft_strjoin(char const *s1, char const *s2)
 	return (dst);
 }
 
-char				*ft_strchr(const char *s, int c)
+char					*ft_strchr(const char *s, int c)
 {
-	unsigned char	ch;
-	char			*str;
+	unsigned char		ch;
+	char				*str;
 
 	ch = (unsigned char)c;
 	str = (char*)s;
@@ -67,10 +67,10 @@ char				*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char				*ft_strdup(const char *s1)
+char					*ft_strdup(const char *s1)
 {
-	char			*dupl;
-	int				count;
+	char				*dupl;
+	int					count;
 
 	if (s1 == NULL)
 		return (NULL);
@@ -85,4 +85,31 @@ char				*ft_strdup(const char *s1)
 	}
 	dupl[count] = '\0';
 	return (dupl);
+}
+
+size_t					ft_strlcpy(char *dst, const char *src, size_t dstsize)
+{
+	unsigned char		*d;
+	const unsigned char	*s;
+	size_t				size;
+	size_t				lensrc;
+
+	d = (unsigned char*)dst;
+	s = (const unsigned char*)src;
+	size = dstsize;
+	if (s == NULL || d == NULL)
+		return (0);
+	lensrc = ft_strlen(src);
+	if (size)
+	{
+		while (--size && *s)
+			*d++ = *s++;
+		*d = '\0';
+	}
+	if (size == 0)
+	{
+		if (dstsize != 0)
+			*d = '\0';
+	}
+	return (lensrc);
 }

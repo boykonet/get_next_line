@@ -24,31 +24,31 @@ void	ft_putendl_fd(char *s, int fd)
 	ft_putchar_fd('\n', fd);
 }
 
-/*int		main()
+int		main()
 {
 	char	*len;
 	int		fd;
-	int		df;
+//	int		df;
 	int		count;
 
-	len = NULL;
-	df = open("result.txt", O_WRONLY | O_CREAT);
-//	fd = open("len.txt", O_RDONLY);
+//	len = NULL;
+//	df = open("result.txt", O_WRONLY | O_CREAT);
+	fd = open("len.txt", O_RDONLY);
 //	fd = open("gull.txt", O_RDONLY);
 //	fd = open("atlas_shrugged.txt", O_RDONLY);
 //	fd = open("empty.txt", O_RDONLY);
 //	fd = open("many_spaces.txt", O_RDONLY);
-	fd = open("147.txt", O_RDONLY);
+//	fd = open("147.txt", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("open() error");
 		return (1);
 	}
-//	while ((count = get_next_line(42, &len)) > 0)
-	while ((count = get_next_line(fd, &len)) > 0)
+	while ((count = get_next_line(42, &len)) > 0)
+//	while ((count = get_next_line(fd, &len)) > 0)
 	{
-		ft_putendl_fd(len, df);
-//		printf("[%d]%s\n", count, len);
+//		ft_putendl_fd(len, df);
+		printf("[%d]%s\n", count, len);
 		free(len);
 	}
 	if (count == 0)
@@ -61,9 +61,9 @@ void	ft_putendl_fd(char *s, int fd)
 		return (1);
 	}
 	return (0);
-}*/
+}
 
-int		main()
+/*int		main()
 {
 	char	*len;
 	int		count;
@@ -74,4 +74,4 @@ int		main()
 		free(len);
 	}
 	return (0);
-}
+}*/

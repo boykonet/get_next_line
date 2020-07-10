@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1
+#  define BUFFER_SIZE 1024
 # endif
 
 # include <stdlib.h>
@@ -24,8 +24,8 @@ typedef struct	s_data
 {
 	char		*rem;
 	char		*var;
-	int			len;
-	int			error;
+	int         len;
+	int			err;
 }				t_data;
 
 int				get_next_line(int fd, char **line);
@@ -33,5 +33,6 @@ size_t			ft_strlen(const char *s);
 char			*ft_strjoin(char const *s1, char const *s2);
 char			*ft_strchr(const char *s, int c);
 char			*ft_strdup(const char *s1);
+size_t			ft_strlcpy(char *dst, const char *src, size_t dstsize);
 
 #endif

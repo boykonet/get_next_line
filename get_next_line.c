@@ -16,71 +16,93 @@ static char		*check_remainder(char **line, char *rem)
 {
 	char		*temp;
 	int			count;
-	int			i;
 
-	i = 0;
 	count = 0;
 	while (rem[count] != '\n')
 		count++;
 	if (((*line) = (char*)malloc(sizeof(char) * (count + 1))) == NULL)
 		return (NULL);
-	count = 0;
-	while (rem[count] != '\n')
-		(*line)[i++] = rem[count++];
-	(*line)[i] = '\0';
+	ft_strlcpy(*line, rem, ++count);
+	(*line)[--count] = '\0';
 	if ((temp = ft_strdup(&rem[++count])) == NULL)
+	{
+		free(*line);
 		return (NULL);
+	}
 	free(rem);
-	if ((rem = ft_strdup(temp)) == NULL)
-		return (NULL);
-	free(temp);
+	rem = temp;
 	return (rem);
 }
 
-static void		init_line(char **line, char *rem, t_data *data)
+static void		init_line(char **line, t_data *data)
 {
-	if (rem)
-	{
-		if ((data->var = ft_strchr(rem, '\n')))
+	data->var = NULL;
+	data->err = 0;
+	if (data->rem)
+		if ((data->var = ft_strchr(data->rem, '\n')))
 		{
-			if ((rem = check_remainder(line, rem)) == NULL)
-				data->error = -1;
+			if ((data->rem = check_remainder(line, data->rem)) == NULL)
+				data->err = -1;
 		}
 		else
 		{
-			if ((*line = ft_strdup(rem)) == NULL)
-				data->error = -1;
-			free(rem);
+			if ((*line = ft_strdup(data->rem)) == NULL)
+				data->err = -1;
+			free(data->rem);
 		}
-	}
 	else
 	{
 		if ((*line = ft_strdup("\0")) == NULL)
-			data->error = -1;
+			data->err = -1;
 	}
-	data->rem = rem;
 }
 
-static void		update_line(char **line, char *buff, char *rem, t_data *data)
+static t_data	*update_line(char **line, char *buff, int len, t_data *data)
 {
 	char		*temp;
 	int			count;
 
+	buff[len] = '\0';
 	count = 0;
-	buff[data->len] = '\0';
 	if ((data->var = ft_strchr(buff, '\n')))
 	{
 		while (buff[count] != '\n')
 			count++;
 		buff[count] = '\0';
-		if ((rem = ft_strdup(&buff[++count])) == NULL)
-			data->error = -1;
+		if ((data->rem = ft_strdup(&buff[++count])) == NULL)
+		{
+			data->err = -1;
+			return (data);
+		}
 	}
 	temp = *line;
 	if ((*line = ft_strjoin(*line, buff)) == NULL)
-		data->error = -1;
-	data->rem = rem;
+	{
+		free(data->rem);
+		data->err = -1;
+	}
 	free(temp);
+	return (data);
+}
+
+static int		prog_logic(char **line, char *buff, int fd, t_data *data)
+{
+	init_line(line, data);
+	if (data->err == -1)
+	{
+		free(data);
+		return (-1);
+	}
+	while (!(data->var) && (data->len = read(fd, buff, BUFFER_SIZE)) > 0)
+	{
+		data = update_line(line, buff, data->len, data);
+		if (data->err == -1)
+		{
+			free(data);
+			return (-1);
+		}
+	}
+	return (0);
 }
 
 int				get_next_line(int fd, char **line)
@@ -88,26 +110,20 @@ int				get_next_line(int fd, char **line)
 	t_data		*data;
 	char		buff[BUFFER_SIZE + 1];
 	static char	*rem;
+	int         len;
 
-	data = (t_data*)malloc(sizeof(t_data));
-	data->rem = rem;
-	data->var = NULL;
-	data->len = 1;
-	data->error = 0;
-	init_line(line, rem, data);
-	if (data->error == -1)
+	if ((data = (t_data*)malloc(sizeof(t_data))) == NULL)
 		return (-1);
-	while (!(data->var) && (data->len = read(fd, buff, BUFFER_SIZE)) > 0)
-	{
-		update_line(line, buff, rem, data);
-		if (data->error == -1)
-			return (-1);
-	}
+	data->rem = rem;
+	data->len = 1;
+	if ((prog_logic(line, buff, fd, data)) == -1)
+		return (-1);
 	rem = data->rem;
+	len = data->len;
 	free(data);
-	if (data->len > 0)
-		return (1);
-	else if (data->len == 0)
-		return (0);
+	if (len > 0)
+        return (1);
+	else if (len == 0)
+        return (0);
 	return (-1);
 }
