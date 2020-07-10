@@ -110,7 +110,7 @@ int				get_next_line(int fd, char **line)
 	t_data		*data;
 	char		buff[BUFFER_SIZE + 1];
 	static char	*rem;
-	int         len;
+	int			len;
 
 	if ((data = (t_data*)malloc(sizeof(t_data))) == NULL)
 		return (-1);
@@ -122,8 +122,8 @@ int				get_next_line(int fd, char **line)
 	len = data->len;
 	free(data);
 	if (len > 0)
-        return (1);
+		return (1);
 	else if (len == 0)
-        return (0);
+		return (0);
 	return (-1);
 }

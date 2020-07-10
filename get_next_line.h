@@ -24,7 +24,7 @@ typedef struct	s_data
 {
 	char		*rem;
 	char		*var;
-	int         len;
+	int			len;
 	int			err;
 }				t_data;
 
