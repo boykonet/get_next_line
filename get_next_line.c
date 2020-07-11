@@ -57,12 +57,12 @@ static void		init_line(char **line, t_data *data)
 	}
 }
 
-static t_data	*update_line(char **line, char *buff, int len, t_data *data)
+static t_data	*update_line(char **line, char *buff, t_data *data)
 {
 	char		*temp;
 	int			count;
 
-	buff[len] = '\0';
+	buff[data->len] = '\0';
 	count = 0;
 	if ((data->var = ft_strchr(buff, '\n')))
 	{
@@ -90,12 +90,13 @@ static int		prog_logic(char **line, char *buff, int fd, t_data *data)
 	init_line(line, data);
 	if (data->err == -1)
 	{
+		free(*line);
 		free(data);
 		return (-1);
 	}
 	while (!(data->var) && (data->len = read(fd, buff, BUFFER_SIZE)) > 0)
 	{
-		data = update_line(line, buff, data->len, data);
+		data = update_line(line, buff, data);
 		if (data->err == -1)
 		{
 			free(data);
@@ -124,6 +125,9 @@ int				get_next_line(int fd, char **line)
 	if (len > 0)
 		return (1);
 	else if (len == 0)
+	{
+		free(*line);
 		return (0);
+	}
 	return (-1);
 }

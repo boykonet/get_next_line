@@ -28,11 +28,11 @@ int		main()
 {
 	char	*len;
 	int		fd;
-//	int		df;
+	int		df;
 	int		count;
 
 //	len = NULL;
-//	df = open("result.txt", O_WRONLY | O_CREAT);
+	df = open("result.txt", O_WRONLY | O_CREAT);
 	fd = open("len.txt", O_RDONLY);
 //	fd = open("gull.txt", O_RDONLY);
 //	fd = open("atlas_shrugged.txt", O_RDONLY);
@@ -44,11 +44,11 @@ int		main()
 		printf("open() error");
 		return (1);
 	}
-	while ((count = get_next_line(42, &len)) > 0)
-//	while ((count = get_next_line(fd, &len)) > 0)
+//	while ((count = get_next_line(42, &len)) > 0)
+	while ((count = get_next_line(fd, &len)) > 0)
 	{
-//		ft_putendl_fd(len, df);
-		printf("[%d]%s\n", count, len);
+		ft_putendl_fd(len, df);
+//		printf("[%d]%s\n", count, len);
 		free(len);
 	}
 	if (count == 0)
