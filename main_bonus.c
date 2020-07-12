@@ -83,7 +83,7 @@ void	ft_putendl_fd(char *s, int fd)
 	return (0);
 }*/
 
-/*int		main()
+int		main()
 {
 	char	*len;
 	int		count;
@@ -94,7 +94,7 @@ void	ft_putendl_fd(char *s, int fd)
 		free(len);
 	}
 	return (0);
-}*/
+}
 
 /*int		main()
 {
@@ -193,7 +193,7 @@ void	ft_putendl_fd(char *s, int fd)
 	return (0);
 }*/
 
-int main()
+/*int main()
 {
 	char	*len;
 	int		count;
@@ -323,4 +323,4 @@ int main()
     }
 
 	return 0;
-}
+}*/
