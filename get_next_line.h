@@ -23,8 +23,10 @@
 typedef struct	s_data
 {
 	char		*rem;
+	char		*temp;
 	char		*var;
 	int			len;
+	int			count;
 	int			err;
 }				t_data;
 

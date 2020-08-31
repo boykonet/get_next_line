@@ -14,28 +14,26 @@
 
 static int			init_line(char **line, t_list *data)
 {
-	if ((data->var = ft_strchr(data->rem, '\n')))
+	if ((data->var = ft_strchr(data->content, '\n')))
 	{
-		data->count = 0;
-		while (data->rem[data->count] != '\n')
-			data->count++;
-		if (((*line) = (char*)malloc(sizeof(char) * (data->count + 1))) == NULL)
-			return (data->err = -1);
-		ft_strlcpy(*line, data->rem, ++(data->count));
-		(*line)[--(data->count)] = '\0';
-		if ((data->temp = ft_strdup(&(data->rem[++(data->count)]))) == NULL)
+		*data->var = '\0';
+		if (((*line) = ft_strdup(data->content)) == NULL)
+			return (-1);
+		data->count = ft_strlen(data->content);
+		if ((data->temp = ft_strdup(&(data->content[++(data->count)]))) == NULL)
 		{
 			free(*line);
-			return (data->err = -1);
+			data->err = -1;
 		}
-		free(data->rem);
-		data->rem = data->temp;
+		free(data->content);
+		data->content = data->temp;
 	}
 	else
 	{
-		if ((*line = ft_strdup(data->rem)) == NULL)
+		if ((*line = ft_strdup(data->content)) == NULL)
 			data->err = -1;
-		free(data->rem);
+		free(data->content);
+		data->content = NULL;
 	}
 	return (data->err);
 }
@@ -45,17 +43,15 @@ static int			update_line(char **line, char *buff, t_list *data)
 	buff[data->len] = '\0';
 	if ((data->var = ft_strchr(buff, '\n')))
 	{
-		data->count = 0;
-		while (buff[data->count] != '\n')
-			data->count++;
-		buff[data->count] = '\0';
-		if ((data->rem = ft_strdup(&buff[++(data->count)])) == NULL)
+		*(data->var) = '\0';
+		data->count = ft_strlen(buff);
+		if ((data->content = ft_strdup(&buff[++(data->count)])) == NULL)
 			return (data->err = -1);
 	}
 	data->temp = *line;
 	if ((*line = ft_strjoin(*line, buff)) == NULL)
 	{
-		free(data->rem);
+		free(data->content);
 		data->err = -1;
 	}
 	free(data->temp);
@@ -66,18 +62,22 @@ static int			prog_logic(char **line, int fd, t_list *data)
 {
 	char buff[BUFFER_SIZE + 1];
 
-	data->len = 1;
 	data->var = NULL;
-	if (data->rem)
+	data->temp = NULL;
+	if (BUFFER_SIZE < 0)
 	{
-		init_line(line, data);
-		if (data->err == -1)
+		data->len = -1;
+		return (0);
+	}
+	if (data->content)
+	{
+		if ((data->err = init_line(line, data)) == -1)
 			return (-1);
 	}
 	else
 	{
 		if ((*line = ft_strdup("\0")) == NULL)
-			data->err = -1;
+			return (-1);
 	}
 	while (!(data->var) && (data->len = read(fd, buff, BUFFER_SIZE)) > 0)
 	{
@@ -87,57 +87,56 @@ static int			prog_logic(char **line, int fd, t_list *data)
 	return (0);
 }
 
-static void			data_init(int fd, t_list **head, t_list **curr, t_list **p)
+static int			data_init(int fd, t_list **head, t_list **curr)
 {
 	if (!(*head))
 	{
 		if ((*head = (t_list*)malloc(sizeof(t_list))) == NULL)
-			return ;
+			return (-1);
+		*(*head) = (t_list) { NULL, NULL, NULL, fd, 1, 0, 0, NULL };
 		*curr = *head;
-		(*curr)->next = NULL;
 	}
 	else
 	{
 		*curr = *head;
 		while ((*curr)->next != NULL && (*curr)->fd != fd)
-		{
-			*p = *curr;
 			*curr = (*curr)->next;
-		}
 		if ((*curr)->next == NULL && (*curr)->fd != fd)
 		{
 			if (((*curr)->next = (t_list*)malloc(sizeof(t_list))) == NULL)
-				return ;
+				return (-1);
 			*curr = (*curr)->next;
-			(*curr)->rem = NULL;
-			(*curr)->next = NULL;
+			*(*curr) = (t_list) { NULL, NULL, NULL, fd, 1, 0, 0, NULL };
 		}
 	}
-	(*curr)->fd = fd;
+	return (0);
 }
 
 int					get_next_line(int fd, char **line)
 {
 	static t_list	*head;
 	t_list			*curr;
-	t_list			*prev;
-	t_list			*next;
+	int				len;
 
-	prev = head;
-	data_init(fd, &head, &curr, &prev);
-	if ((!head) || (!curr))
+	(*line) = NULL;
+	if ((data_init(fd, &head, &curr)) == -1)
 		return (-1);
-	next = curr->next;
-	if ((prog_logic(line, fd, curr)) == -1)
+	prog_logic(line, fd, curr);
+	len = curr->len;
+	if (len == 0 || len == -1)
 	{
-		free(curr);
-		return (-1);
+		curr = head;
+		if (len == -1)
+			free(*line);
+		while ((curr->next != NULL && curr->len == 0)
+			|| (curr->next != NULL && len == -1))
+		{
+			if (len == -1 && curr->content != NULL)
+				free(curr->content);
+			curr = curr->next;
+		}
+		if ((curr->next == NULL && curr->len == 0) || len == -1)
+			ft_lstclear(&head, NULL);
 	}
-	if (curr->len == 0)
-	{
-		free(curr);
-		prev->next = next;
-		free(*line);
-	}
-	return (curr->len > 1 ? 1 : curr->len);
+	return (len > 1 ? 1 : len);
 }

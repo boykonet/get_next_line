@@ -20,16 +20,16 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-typedef struct		s_data
+typedef struct		s_list
 {
-	char			*rem;
+	char			*content;
 	char			*var;
 	char			*temp;
 	int				fd;
 	int				len;
 	int				count;
 	int				err;
-	struct s_data	*next;
+	struct s_list	*next;
 }					t_list;
 
 int					get_next_line(int fd, char **line);
@@ -37,6 +37,6 @@ size_t				ft_strlen(const char *s);
 char				*ft_strjoin(char const *s1, char const *s2);
 char				*ft_strchr(const char *s, int c);
 char				*ft_strdup(const char *s1);
-size_t				ft_strlcpy(char *dst, const char *src, size_t dstsize);
+void				ft_lstclear(t_list **lst, void (*del)(void *));
 
 #endif

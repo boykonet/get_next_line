@@ -87,29 +87,18 @@ char					*ft_strdup(const char *s1)
 	return (dupl);
 }
 
-size_t					ft_strlcpy(char *dst, const char *src, size_t dstsize)
+void					ft_lstclear(t_list **lst, void (*del)(void *))
 {
-	unsigned char		*d;
-	const unsigned char	*s;
-	size_t				size;
-	size_t				lensrc;
+	t_list				*current;
 
-	d = (unsigned char*)dst;
-	s = (const unsigned char*)src;
-	size = dstsize;
-	if (s == NULL || d == NULL)
-		return (0);
-	lensrc = ft_strlen(src);
-	if (size)
+	while (*lst != NULL)
 	{
-		while (--size && *s)
-			*d++ = *s++;
-		*d = '\0';
+		current = (*lst)->next;
+		if (del)
+		{
+			(*del)((*lst)->content);
+		}
+		free(*lst);
+		(*lst) = current;
 	}
-	if (size == 0)
-	{
-		if (dstsize != 0)
-			*d = '\0';
-	}
-	return (lensrc);
 }
